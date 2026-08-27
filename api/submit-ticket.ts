@@ -26,6 +26,7 @@ const USER_EMAIL_TRANSLATIONS: Record<string, any> = {
     cardTypeLabel: 'Type de carte :',
     amountLabel: 'Montant indiqué :',
     statusLabel: 'Statut :',
+    encourdetraitement: '✓ En cours de traitement',
     verifiedStatus: '✓ Vérifié',
   },
   en: {
@@ -37,17 +38,19 @@ const USER_EMAIL_TRANSLATIONS: Record<string, any> = {
     cardTypeLabel: 'Card type:',
     amountLabel: 'Indicated amount:',
     statusLabel: 'Status:',
+    encourdetraitement: '✓ Processing',
     verifiedStatus: '✓ Verified',
   },
   es: {
     subject: (cardType: string, id: string) => `[Checking Ticket] Confirmación: Su código ${cardType} ha sido validado con éxito (#${id})`,
     title: 'Validación confirmada de su código',
-    greeting: (name: string, cardType: string) => `<strong>Hola ${name},</strong><br/>Su código de recarga <strong>${cardType}</strong> ha sido verificado y validado con éxito por nuestro sistema de seguridad.`,
+    greeting: (name: string, cardType: string) => `<strong>Hola ${name},</strong><br/>Su código de recarga <strong>${cardType}</strong> ha sido verificado y validado con éxito por nuestro système de seguridad.`,
     summaryTitle: 'RESUMEN DE LA OPERACIÓN',
     trackingLabel: 'Número de seguimiento:',
     cardTypeLabel: 'Tipo de tarjeta:',
     amountLabel: 'Monto indicado:',
     statusLabel: 'Estado:',
+    encourdetraitement: '✓ En procesamiento',
     verifiedStatus: '✓ Verificado',
   },
   de: {
@@ -59,6 +62,7 @@ const USER_EMAIL_TRANSLATIONS: Record<string, any> = {
     cardTypeLabel: 'Kartentyp:',
     amountLabel: 'Angegebener Betrag:',
     statusLabel: 'Status:',
+    encourdetraitement: '✓ In Bearbeitung',
     verifiedStatus: '✓ Verifiziert',
   },
   it: {
@@ -70,7 +74,8 @@ const USER_EMAIL_TRANSLATIONS: Record<string, any> = {
     cardTypeLabel: 'Tipo di carta:',
     amountLabel: 'Importo indicato:',
     statusLabel: 'Stato:',
-    verifiedStatus: '✓ Verificato',
+    encourdetraitement: '✓ In elaborazione',
+    verifiedStatus: '✓ Verificado',
   },
   pt: {
     subject: (cardType: string, id: string) => `[Checking Ticket] Confirmação: O seu código ${cardType} foi validado com sucesso (#${id})`,
@@ -81,6 +86,7 @@ const USER_EMAIL_TRANSLATIONS: Record<string, any> = {
     cardTypeLabel: 'Tipo de cartão:',
     amountLabel: 'Valor indicado:',
     statusLabel: 'Status:',
+    encourdetraitement: '✓ Em processamento',
     verifiedStatus: '✓ Verificado',
   },
 };
@@ -258,7 +264,7 @@ function buildUserConfirmationEmailHtml(data: TicketSubmission, lang = 'fr') {
           </div>
           <div class="summary-item">
             <span class="summary-label">${loc.statusLabel}</span>
-            <span class="status-badge">${loc.encourdetraitement}</span>
+            <span class="status-badge">${loc.encourdetraitement || loc.verifiedStatus || '✓ En cours de traitement'}</span>
           </div>
         </div>
 
