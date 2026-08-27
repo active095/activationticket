@@ -57,60 +57,17 @@ export const CardVisual: React.FC<CardVisualProps> = ({ type, customImage, class
 
     case 'Transcash':
       return (
-        <div className={`relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-black text-white flex items-center justify-center p-4 sm:p-6 shadow-md border border-zinc-900 select-none ${className}`}>
-          {/* Deep black background with subtle clean gradient */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0e0e11] to-[#040404] pointer-events-none"></div>
+        <div className={`relative w-full aspect-[16/10] rounded-2xl overflow-hidden bg-black text-white flex items-center justify-center p-6 shadow-xl border border-zinc-800/80 select-none ${className}`}>
+          {/* Subtle diagonal sheen/lighting across the card matching the image */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-black via-zinc-950/90 to-zinc-800/20 pointer-events-none"></div>
+          <div className="absolute -top-1/2 -right-1/4 w-full h-full bg-radial from-zinc-700/10 via-transparent to-transparent pointer-events-none"></div>
 
-          {/* Centered Transcash Logo matching the exact card design */}
-          <div className="relative z-10 w-full max-w-[280px] sm:max-w-[310px] flex items-center justify-center">
-            <svg viewBox="0 0 340 140" className="w-full h-auto drop-shadow-sm" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* Left swoosh arc curving up over 'trans' */}
-              <path
-                d="M 64 86 C 56 68 76 49 118 41 C 126 39 135 38 144 37 L 138 48 C 130 49 122 50 114 52 C 84 58 71 70 77 82 C 80 89 89 95 102 99 L 95 108 C 77 103 67 95 64 86 Z"
-                fill="#EB2427"
-              />
-              {/* Right swoosh arc with diagonal apex gap */}
-              <path
-                d="M 152 36 C 162 36 173 37 184 38 C 220 44 246 56 254 70 C 262 84 249 97 220 105 C 197 111 168 113 138 112 L 140 102 C 166 103 192 101 212 96 C 235 90 244 80 238 72 C 232 62 210 52 178 47 C 169 46 160 45 150 45 Z"
-                fill="#EB2427"
-              />
-              {/* Wordmark "trans" in pure white */}
-              <text
-                x="88"
-                y="85"
-                fill="#FFFFFF"
-                fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-                fontWeight="800"
-                fontSize="42"
-                letterSpacing="-0.8"
-              >
-                trans
-              </text>
-              {/* Wordmark "cash" in vivid red */}
-              <text
-                x="200"
-                y="85"
-                fill="#EB2427"
-                fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-                fontWeight="800"
-                fontSize="42"
-                letterSpacing="-0.8"
-              >
-                cash
-              </text>
-              {/* Registered Trademark ® */}
-              <circle cx="298" cy="70" r="5" stroke="#EB2427" strokeWidth="1.2" fill="none" />
-              <text
-                x="295.8"
-                y="72.8"
-                fill="#EB2427"
-                fontFamily="system-ui, -apple-system, BlinkMacSystemFont, sans-serif"
-                fontWeight="700"
-                fontSize="7.5"
-              >
-                R
-              </text>
-            </svg>
+          {/* Centered Transcash Logo */}
+          <div className="relative z-10 flex items-center justify-center">
+            <span className="font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight leading-none flex items-center">
+              <span className="text-white drop-shadow-sm">Trans</span>
+              <span className="text-[#DC2626] drop-shadow-sm ml-0.5">cash</span>
+            </span>
           </div>
         </div>
       );
