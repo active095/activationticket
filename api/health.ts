@@ -7,4 +7,4 @@ export default function handler(req: any, res: any) {
     timestamp: new Date().toISOString() 
   });
 }
-// test modification
+// test modificat
