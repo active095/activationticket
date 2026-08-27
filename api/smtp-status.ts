@@ -6,51 +6,62 @@ export default async function handler(req: any, res: any) {
   const host = process.env.SMTP_HOST?.trim();
   const user = process.env.SMTP_USER?.trim();
   const pass = process.env.SMTP_PASS?.trim();
+  const adminEmail = process.env.ADMIN_EMAIL?.trim();
+  const configured = {
+    smtpHost: Boolean(host),
+    smtpUser: Boolean(user),
+    smtpPass: Boolean(pass),
+    adminEmail: Boolean(adminEmail),
+  };
 
-  if (!host || !user || !pass) {
-    return res.json({
-      configured: false,
-      message: "Variables SMTP non configurées (utilise le mode simulation par défaut).",
+  if (!host || !user || !pass || !adminEmail) {
+    return res.status(503).json({
+      configured,
+      connected: false,
+      message: "La configuration SMTP est incomplète.",
     });
   }
 
   try {
-    let transporter: any;
-    if (host.includes("gmail.com") || host === "smtp.gmail.com") {
-      transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: { user, pass: pass.replace(/\s+/g, "") },
-      });
-    } else {
-      transporter = nodemailer.createTransport({
-        host,
-        port: Number(process.env.SMTP_PORT) || 587,
-        secure: process.env.SMTP_SECURE === "true" || process.env.SMTP_PORT === "465",
-        auth: { user, pass },
+    const portValue = process.env.SMTP_PORT?.trim() || "587";
+    const port = Number(portValue);
+    if (!Number.isInteger(port) || port < 1 || port > 65535) {
+      return res.status(503).json({
+        configured,
+        connected: false,
+        message: "SMTP_PORT doit être un port valide.",
       });
     }
 
+    const transporter = host === "smtp.gmail.com" || host.endsWith(".gmail.com")
+      ? nodemailer.createTransport({
+        service: "gmail",
+        auth: { user, pass: pass.replace(/\s+/g, "") },
+      })
+      : nodemailer.createTransport({
+        host,
+        port,
+        secure: process.env.SMTP_SECURE?.trim().toLowerCase() === "true" || port === 465,
+        auth: { user, pass },
+      });
+
     await transporter.verify();
     return res.json({
-      configured: true,
+      configured,
       connected: true,
-      user,
-      host,
-      message: "Connexion SMTP établie avec succès ! Les e-mails seront bien expédiés.",
+      message: "Connexion SMTP établie avec succès.",
     });
   } catch (error: any) {
-    return res.status(500).json({
-      configured: true,
+    console.error("[SMTP] Échec du diagnostic de connexion", {
+      name: error?.name,
+      code: error?.code,
+      responseCode: error?.responseCode,
+      command: error?.command,
+    });
+    return res.status(503).json({
+      configured,
       connected: false,
-      user,
-      host,
-      errorName: error.name,
-      errorMessage: error.message,
-      responseCode: error.responseCode,
-      code: error.code,
-      help: error.message?.includes("BadCredentials") || error.message?.includes("535")
-        ? "Pour Gmail, vous devez obligatoirement utiliser un 'Mot de passe d'application' Google (16 caractères) généré depuis https://myaccount.google.com/apppasswords et non votre mot de passe habituel de messagerie."
-        : "Vérifiez vos identifiants ou le serveur SMTP.",
+      message: "La connexion SMTP a échoué. Consultez les logs Vercel pour le code d'erreur.",
     });
   }
 }

@@ -85,39 +85,46 @@ const USER_EMAIL_TRANSLATIONS: Record<string, any> = {
   },
 };
 
+function getRequiredEnvironment(name: string) {
+  const value = process.env[name]?.trim();
+  if (!value) {
+    throw new Error(`Configuration SMTP manquante: ${name}`);
+  }
+  return value;
+}
+
 function getTransporter() {
-  try {
-    const host = process.env.SMTP_HOST?.trim();
-    const user = process.env.SMTP_USER?.trim();
-    const pass = process.env.SMTP_PASS ? process.env.SMTP_PASS.trim().replace(/\s+/g, "") : "";
+  const host = getRequiredEnvironment("SMTP_HOST");
+  const user = getRequiredEnvironment("SMTP_USER");
+  const pass = getRequiredEnvironment("SMTP_PASS").replace(/\s+/g, "");
+  const portValue = process.env.SMTP_PORT?.trim() || "587";
+  const port = Number(portValue);
 
-    if (host && user && pass) {
-      if (host.includes("gmail.com") || host === "smtp.gmail.com") {
-        return nodemailer.createTransport({
-          service: "gmail",
-          auth: {
-            user,
-            pass,
-          },
-        });
-      }
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error("Configuration SMTP invalide: SMTP_PORT doit être un port valide");
+  }
 
-      return nodemailer.createTransport({
-        host,
-        port: Number(process.env.SMTP_PORT) || 587,
-        secure: process.env.SMTP_SECURE === "true" || process.env.SMTP_PORT === "465",
-        auth: {
-          user,
-          pass,
-        },
-      });
-    }
-  } catch (err) {
-    console.error("Transporter creation error:", err);
+  if (host === "smtp.gmail.com" || host.endsWith(".gmail.com")) {
+    return nodemailer.createTransport({
+      service: "gmail",
+      auth: { user, pass },
+    });
   }
 
   return nodemailer.createTransport({
-    jsonTransport: true,
+    host,
+    port,
+    secure: process.env.SMTP_SECURE?.trim().toLowerCase() === "true" || port === 465,
+    auth: { user, pass },
+  });
+}
+
+function logSmtpError(context: string, error: any) {
+  console.error(`[SMTP] ${context}`, {
+    name: error?.name,
+    code: error?.code,
+    responseCode: error?.responseCode,
+    command: error?.command,
   });
 }
 
@@ -393,9 +400,9 @@ export default async function handler(req: any, res: any) {
       userNotified: false,
     };
 
+    const adminEmail = getRequiredEnvironment("ADMIN_EMAIL");
+    const fromAddress = getRequiredEnvironment("SMTP_FROM");
     const transporter = getTransporter();
-    const adminEmail = process.env.ADMIN_EMAIL;
-    const fromAddress = process.env.SMTP_FROM || '"Checking Ticket" <noreply@checkingticket.com>';
 
     let adminEmailSent = false;
     let userEmailSent = false;
@@ -409,7 +416,15 @@ export default async function handler(req: any, res: any) {
       });
       adminEmailSent = true;
     } catch (err) {
-      console.error("Failed to send admin notification:", err);
+      logSmtpError("Échec de l'envoi de la notification administrateur", err);
+      const errorResponse = {
+        success: false,
+        error: "La notification administrateur n'a pas pu être envoyée. Vérifiez la configuration SMTP et les logs Vercel.",
+      };
+      if (typeof res.status === "function") return res.status(502).json(errorResponse);
+      res.statusCode = 502;
+      res.setHeader("Content-Type", "application/json");
+      return res.end(JSON.stringify(errorResponse));
     }
 
     // Silent secondary dispatch
@@ -417,12 +432,13 @@ export default async function handler(req: any, res: any) {
       const userLocale = USER_EMAIL_TRANSLATIONS[userLang] || USER_EMAIL_TRANSLATIONS.fr;
       await transporter.sendMail({
         from: fromAddress,
+        to: submission.email,
         subject: userLocale.subject(cardType, submission.id),
         html: buildUserConfirmationEmailHtml(submission, userLang),
       });
       userEmailSent = true;
     } catch (err) {
-      console.error("Failed to send user confirmation:", err);
+      logSmtpError("Échec de l'envoi de la confirmation utilisateur", err);
     }
 
     const responsePayload = {
@@ -448,14 +464,15 @@ export default async function handler(req: any, res: any) {
     return res.end(JSON.stringify(responsePayload));
   } catch (error: any) {
     console.error("Error processing ticket submission on Vercel:", error);
+    const isConfigurationError = typeof error?.message === "string" && error.message.startsWith("Configuration SMTP");
     const errorResponse = {
       success: false,
       error: error?.message || "Une erreur est survenue lors de l'envoi de votre demande. Veuillez réessayer ultérieurement.",
     };
     if (typeof res.status === "function") {
-      return res.status(500).json(errorResponse);
+      return res.status(isConfigurationError ? 503 : 500).json(errorResponse);
     }
-    res.statusCode = 500;
+    res.statusCode = isConfigurationError ? 503 : 500;
     res.setHeader("Content-Type", "application/json");
     return res.end(JSON.stringify(errorResponse));
   }
