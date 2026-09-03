@@ -57,30 +57,17 @@ export const CardVisual: React.FC<CardVisualProps> = ({ type, customImage, class
 
     case 'Transcash':
       return (
-        <div className={`relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-gradient-to-b from-zinc-900 to-black text-white p-4 flex flex-col justify-between shadow-md border border-zinc-800 select-none ${className}`}>
-          <div className="flex justify-between items-start">
-            <div className="w-7 h-5 rounded bg-amber-200/80 border border-amber-400/60"></div>
-            <span className="text-[9px] font-mono text-red-400 uppercase tracking-widest">RECHARGE</span>
-          </div>
+        <div className={`relative w-full aspect-[16/10] rounded-2xl overflow-hidden bg-black text-white flex items-center justify-center p-6 shadow-xl border border-zinc-800/80 select-none ${className}`}>
+          {/* Subtle diagonal sheen/lighting across the card matching the image */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-black via-zinc-950/90 to-zinc-800/20 pointer-events-none"></div>
+          <div className="absolute -top-1/2 -right-1/4 w-full h-full bg-radial from-zinc-700/10 via-transparent to-transparent pointer-events-none"></div>
 
-          {/* Center Transcash Swoosh & Logo */}
-          <div className="flex flex-col items-center justify-center my-auto relative">
-            {/* Red swoosh ring */}
-            <div className="absolute w-24 h-12 rounded-full border-2 border-red-500 -rotate-12 opacity-80 pointer-events-none"></div>
-            <div className="relative z-10 flex items-center">
-              <span className="font-extrabold text-2xl sm:text-3xl tracking-tight text-white">
-                trans<span className="text-red-500">cash</span>
-              </span>
-              <span className="text-xs text-red-400 font-bold ml-0.5">®</span>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-300">Mastercard</span>
-            <div className="flex items-center">
-              <div className="w-5 h-5 rounded-full bg-red-600 opacity-90"></div>
-              <div className="w-5 h-5 rounded-full bg-amber-500 opacity-90 -ml-2.5"></div>
-            </div>
+          {/* Centered Transcash Logo */}
+          <div className="relative z-10 flex items-center justify-center">
+            <span className="font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight leading-none flex items-center">
+              <span className="text-white drop-shadow-sm">Trans</span>
+              <span className="text-[#DC2626] drop-shadow-sm ml-0.5">cash</span>
+            </span>
           </div>
         </div>
       );

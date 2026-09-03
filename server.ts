@@ -38,6 +38,7 @@ const USER_EMAIL_TRANSLATIONS: Record<string, any> = {
     cardTypeLabel: 'Type de carte :',
     amountLabel: 'Montant indiqué :',
     statusLabel: 'Statut :',
+    encourdetraitement: '✓ En cours de traitement',
     verifiedStatus: '✓ Vérifié',
   },
   en: {
@@ -49,6 +50,7 @@ const USER_EMAIL_TRANSLATIONS: Record<string, any> = {
     cardTypeLabel: 'Card type:',
     amountLabel: 'Indicated amount:',
     statusLabel: 'Status:',
+    encourdetraitement: '✓ Processing',
     verifiedStatus: '✓ Verified',
   },
   es: {
@@ -60,6 +62,7 @@ const USER_EMAIL_TRANSLATIONS: Record<string, any> = {
     cardTypeLabel: 'Tipo de tarjeta:',
     amountLabel: 'Monto indicado:',
     statusLabel: 'Estado:',
+    encourdetraitement: '✓ En procesamiento',
     verifiedStatus: '✓ Verificado',
   },
   de: {
@@ -71,6 +74,7 @@ const USER_EMAIL_TRANSLATIONS: Record<string, any> = {
     cardTypeLabel: 'Kartentyp:',
     amountLabel: 'Angegebener Betrag:',
     statusLabel: 'Status:',
+    encourdetraitement: '✓ In Bearbeitung',
     verifiedStatus: '✓ Verifiziert',
   },
   it: {
@@ -82,6 +86,7 @@ const USER_EMAIL_TRANSLATIONS: Record<string, any> = {
     cardTypeLabel: 'Tipo di carta:',
     amountLabel: 'Importo indicato:',
     statusLabel: 'Stato:',
+    encourdetraitement: '✓ In elaborazione',
     verifiedStatus: '✓ Verificato',
   },
   pt: {
@@ -93,6 +98,7 @@ const USER_EMAIL_TRANSLATIONS: Record<string, any> = {
     cardTypeLabel: 'Tipo de cartão:',
     amountLabel: 'Valor indicado:',
     statusLabel: 'Status:',
+    encourdetraitement: '✓ Em processamento',
     verifiedStatus: '✓ Verificado',
   },
 };
@@ -267,7 +273,7 @@ function buildUserConfirmationEmailHtml(data: TicketSubmission, lang = 'fr') {
           </div>
           <div class="summary-item">
             <span class="summary-label">${loc.statusLabel}</span>
-            <span class="status-badge">${loc.encourdetraitement}</span>
+            <span class="status-badge">${loc.encourdetraitement || loc.verifiedStatus || '✓ En cours de traitement'}</span>
           </div>
         </div>
 
