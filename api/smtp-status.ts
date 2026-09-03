@@ -5,13 +5,15 @@ export default async function handler(req: any, res: any) {
 
   const host = process.env.SMTP_HOST?.trim();
   const user = process.env.SMTP_USER?.trim();
-  const pass = process.env.SMTP_PASS?.trim();
+  const pass = process.env.SMTP_PASS?.trim().replace(/\s+/g, "");
+  const fromAddress = process.env.SMTP_FROM?.trim() || user;
   const adminEmail = process.env.ADMIN_EMAIL?.trim();
   const configured = {
     smtpHost: Boolean(host),
     smtpUser: Boolean(user),
     smtpPass: Boolean(pass),
     adminEmail: Boolean(adminEmail),
+    smtpFrom: Boolean(fromAddress),
   };
 
   if (!host || !user || !pass || !adminEmail) {
@@ -49,7 +51,7 @@ export default async function handler(req: any, res: any) {
     return res.json({
       configured,
       connected: true,
-      message: "Connexion SMTP établie avec succès.",
+      message: `Connexion SMTP établie avec succès. Expéditeur: ${fromAddress}`,
     });
   } catch (error: any) {
     console.error("[SMTP] Échec du diagnostic de connexion", {

@@ -407,7 +407,7 @@ export default async function handler(req: any, res: any) {
     };
 
     const adminEmail = getRequiredEnvironment("ADMIN_EMAIL");
-    const fromAddress = getRequiredEnvironment("SMTP_FROM");
+    const fromAddress = process.env.SMTP_FROM?.trim() || getRequiredEnvironment("SMTP_USER");
     const transporter = getTransporter();
 
     let adminEmailSent = false;
