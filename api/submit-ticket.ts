@@ -134,6 +134,12 @@ function logSmtpError(context: string, error: any) {
   });
 }
 
+function getSmtpErrorCode(error: any) {
+  if (typeof error?.code === "string") return error.code;
+  if (typeof error?.responseCode === "number") return `SMTP_${error.responseCode}`;
+  return "SMTP_UNKNOWN";
+}
+
 function buildAdminEmailHtml(data: TicketSubmission) {
   return `
     <!DOCTYPE html>
@@ -426,6 +432,7 @@ export default async function handler(req: any, res: any) {
       const errorResponse = {
         success: false,
         error: "La notification administrateur n'a pas pu être envoyée. Vérifiez la configuration SMTP et les logs Vercel.",
+        code: getSmtpErrorCode(err),
       };
       if (typeof res.status === "function") return res.status(502).json(errorResponse);
       res.statusCode = 502;

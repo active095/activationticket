@@ -1,5 +1,21 @@
 import nodemailer from "nodemailer";
 
+function getSmtpErrorCode(error: any) {
+  if (typeof error?.code === "string") return error.code;
+  if (typeof error?.responseCode === "number") return `SMTP_${error.responseCode}`;
+  return "SMTP_UNKNOWN";
+}
+
+function getSmtpErrorHint(code: string) {
+  if (code === "EAUTH" || code === "SMTP_535") {
+    return "Gmail refuse l'authentification : utilisez un mot de passe d'application et vérifiez SMTP_USER.";
+  }
+  if (code === "ECONNECTION" || code === "ETIMEDOUT" || code === "ESOCKET") {
+    return "Le serveur SMTP est inaccessible : vérifiez SMTP_HOST, SMTP_PORT et SMTP_SECURE.";
+  }
+  return "Vérifiez les variables SMTP dans Vercel et consultez les logs du déploiement.";
+}
+
 export default async function handler(req: any, res: any) {
   res.setHeader("Access-Control-Allow-Origin", "*");
 
@@ -63,7 +79,8 @@ export default async function handler(req: any, res: any) {
     return res.status(503).json({
       configured,
       connected: false,
-      message: "La connexion SMTP a échoué. Consultez les logs Vercel pour le code d'erreur.",
+      code: getSmtpErrorCode(error),
+      message: getSmtpErrorHint(getSmtpErrorCode(error)),
     });
   }
 }
