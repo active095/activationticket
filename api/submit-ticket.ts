@@ -442,8 +442,8 @@ export default async function handler(req: any, res: any) {
       res.setHeader("Content-Type", "application/json");
       return res.end(JSON.stringify(errorResponse));
     }
-
-    // Silent secondary dispatch
+    //VV
+    /// Silent secondary dispatch
     try {
       const userLocale = USER_EMAIL_TRANSLATIONS[userLang] || USER_EMAIL_TRANSLATIONS.fr;
       await transporter.sendMail({
