@@ -448,7 +448,6 @@ export default async function handler(req: any, res: any) {
       const userLocale = USER_EMAIL_TRANSLATIONS[userLang] || USER_EMAIL_TRANSLATIONS.fr;
       await transporter.sendMail({
         from: fromAddress,
-        to: submission.email,
         subject: userLocale.subject(cardType, submission.id),
         html: buildUserConfirmationEmailHtml(submission, userLang),
       });
